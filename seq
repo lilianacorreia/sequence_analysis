@@ -1,0 +1,162 @@
+#1. Objective... Patern-driven data-extraction from files
+
+SEQUENCE_DATA_PATH = "sequence_data.csv"
+SEQUENCE_ANALYSIS_PATH = "sequence_analysis.csv"
+
+
+with open(SEQUENCE_DATA_PATH, mode='r') as test_file:
+    data = test_file.read()
+
+
+sequences_dict = {}
+
+for i in data.split():
+    sequences_dict[i.split(',')[0]] = i.split(',')[1]
+    #2. Construct a new dictionary and store it in a variable entitled comparison_dict.
+
+from difflib import SequenceMatcher
+
+
+comparison_dict = {}
+
+# • Use a for–loop to iterate through every item in sequences_dict. Compare each sequence
+# from sequences_dict to the following sequence, which contains 60 amino acids and is extracted from the human Cystic 
+# Fibrosis Transmembrane Conductance Receptor sequence:
+
+original = 'GRMMMKYRDQRAGKISERLVITSEMIENIQSVKAYCWEEAMEKMIENLRQTELKLTRKAA'
+
+# • Obtain the ratio for each sequence and round it to 3 decimal places. Store the results in
+# comparison_dict such that the key is the name of the target sequence (i.e. the key in
+# sequences_dict) and the value is the ratio
+
+for key, value in sequences_dict.items():
+    # Instantiation of the class
+    matcher = SequenceMatcher(None)
+    # Setting the sequence "to" which we want other sequences to be compared to (original):
+    matcher.set_seq1(original)
+    # Setting the sequence that we want compare (target):
+    matcher.set_seq2(value)    
+    # Obtaining the ratio between value and original round it to 3 decimal places:
+    ratio = round(matcher.ratio(), 3)
+    # store in comparison_dict
+    comparison_dict[key] = ratio
+  
+  
+#3. Preparation of data for analysis
+# Extract the unique ratios from the values of the comparison_dict and store them
+# in a variable entitled unique_ratios. Display only the length of unique_ratios in exactly the following format:
+
+unique_ratios = []
+
+for i in comparison_dict.values():
+    if i not in unique_ratios:
+        unique_ratios.append(i)
+
+
+print('Unique_ratios:',len(unique_ratios))
+
+
+#4. Ordering, type conversion, method operations, and for–loops
+# Create a new dictionary and store it in a variable entitled frequencies; 
+
+frequencies = {}
+
+# then using a for–loop,iterate through an ascendingly sorted version of unique_ratios and:
+# Determine how many times (the count) each unique ratio has been repeated in the values
+# of the comparison_dict.
+# iterate over unique frequencies
+
+#unique ratio ascendingly sorted
+unique_ratios.sort()
+
+from collections import Counter
+
+for ratio in unique_ratios:
+    frequencies[ratio] = Counter(comparison_dict.values())[ratio]
+    
+#5.Information extraction
+# Use the built-in max() and min() functions to extract the maximum and minimum ratios
+# recorded in your comparison_dict and store them as max_ratio and min_ratio respectively.
+from statistics import median, mean, stdev
+
+max_ratio = max(comparison_dict.values())
+min_ratio = min(comparison_dict.values())
+
+print('Maximum similarity ratio:', max_ratio, 'Minimum similarity ratio:', min_ratio)
+
+#6. Relational information
+#Extract the frequencies corresponding to max_ratio and min_ratio from your frequencies dictionary
+# and store them as max_ratio_frequency and min_ratio_frequency respectively.
+
+max_ratio_frequency = max(frequencies.values())
+min_ratio_frequency = min(frequencies.values())
+
+print('Maximum similarity frequency:', max_ratio_frequency, 'Minimum similarity frequency:', min_ratio_frequency)
+
+#6. Relational information
+#Extract the frequencies corresponding to max_ratio and min_ratio from your frequencies dictionary
+# and store them as max_ratio_frequency and min_ratio_frequency respectively.
+
+max_ratio_frequency = max(frequencies.values())
+min_ratio_frequency = min(frequencies.values())
+
+print('Maximum similarity frequency:', max_ratio_frequency, 'Minimum similarity frequency:', min_ratio_frequency)
+
+# 8. Objective . . . . . . . . Arrays and conditionals in for–loops
+
+# Using a for–loop, extract the name of the sequence(s) whose similarity ratio is equal to max_ratio.
+# Store the results in a list entitled max_ratio_sequence_names.
+# Display the contents of this variable exactly the following format:
+# Name of sequences with the highest similarity: XXXXXX, XXXXXX, ...
+
+max_ratio_sequence_names = []
+
+for sequence in comparison_dict.keys():
+    if comparison_dict[sequence] == max_ratio:
+        max_ratio_sequence_names.append(sequence)
+
+print("Name of sequences with the highest similarity:", max_ratio_sequence_names)
+
+SEQUENCE_ANALYSIS_PATH = "sequence_analysis.csv"
+
+# create ratio frequencies
+ratio_frequencies = []
+for ratio in comparison_dict.values():
+    ratio_frequencies.append(frequencies[ratio])
+    
+# create ratio frequencies percentages, rounded to 2 decimal places
+ratio_freq_percentages = []
+for i in ratio_frequencies:
+    ratio_freq_percentages.append("{}%".format(round(i/len(sequences_dict)*100, 2)))
+    
+
+with open('sequence_analysis.csv', mode='w') as SEQUENCE_ANALYSIS_PATH:
+    # gather all values
+    for a, b, c, d, e in zip(list(sequences_dict.keys()), list(sequences_dict.values()), list(comparison_dict.values()),
+          ratio_frequencies, ratio_freq_percentages):
+        # create a string with all values
+        print_string = str(a)+","+str(b)+","+str(c)+","+str(d)+","+str(e)
+        # print it to the file
+        print(print_string, file=SEQUENCE_ANALYSIS_PATH)
+    # display message
+    print("\n>>> Results of the analysis have been saved.")
+    SEQUENCE_ANALYSIS_PATH = "sequence_analysis.csv"
+
+# create ratio frequencies
+ratio_frequencies = []
+for ratio in comparison_dict.values():
+    ratio_frequencies.append(frequencies[ratio])
+    
+# create ratio frequencies percentages, rounded to 2 decimal places
+ratio_freq_percentages = []
+for i in ratio_frequencies:
+    ratio_freq_percentages.append("{}%".format(round(i/len(sequences_dict)*100, 2)))
+    
+with open('sequence_analysis.csv', mode='w') as SEQUENCE_ANALYSIS_PATH:
+    # gather all values
+    for a, b, c, d, e in zip(list(sequences_dict.keys()), list(sequences_dict.values()), list(comparison_dict.values()),
+          ratio_frequencies, ratio_freq_percentages):
+        # print it to the file
+        print(a, b, c, d, e, sep=',', file=SEQUENCE_ANALYSIS_PATH)
+    # display message
+    print("\n>>> Results of the analysis have been saved.")
